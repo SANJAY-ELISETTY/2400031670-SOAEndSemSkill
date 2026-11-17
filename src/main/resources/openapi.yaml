@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: Application Service API
+  version: 1.0.0
+  description: Contract for the provider GET Application endpoint consumed by another microservice.
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/applications/{id}:
+    get:
+      operationId: getApplicationById
+      summary: Get an application by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Unique application identifier
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: Application returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
+              example:
+                id: 101
+                applicantName: Sanjay
+                applicationType: Student
+                status: APPROVED
+        '404':
+          description: Application does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: APPLICATION_NOT_FOUND
+                message: No application found with id 999
+
+components:
+  schemas:
+    ApplicationResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - applicantName
+        - applicationType
+        - status
+      properties:
+        id:
+          type: integer
+          format: int64
+          minimum: 1
+        applicantName:
+          type: string
+          minLength: 1
+        applicationType:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          enum:
+            - APPROVED
+            - PENDING
+            - REJECTED
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+        message:
+          type: string
